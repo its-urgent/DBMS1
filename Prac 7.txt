@@ -1,0 +1,54 @@
+Write a database trigger on WorkCenters table. The System should keep track of the 
+records that are being inserted. The capacity of work inserted in WorkCenters table 
+should be reflected in WorkCenterStats table as a total capacity. 
+
+-- WorkCenters table
+CREATE TABLE WorkCenters (
+    work_center_id INT PRIMARY KEY,
+    work_center_name VARCHAR(255),
+    capacity INT
+);
+
+-- WorkCenterStats table to hold the total capacity
+CREATE TABLE WorkCenterStats (
+    total_capacity INT
+);
+
+
+-- Insert sample records into WorkCenters
+INSERT INTO WorkCenters (work_center_id, work_center_name, capacity) 
+VALUES
+(1, 'Assembly Line 1', 100),
+(2, 'Assembly Line 2', 150),
+(3, 'Packaging', 80);
+
+-- Insert initial record into WorkCenterStats (assuming starting capacity is 0)
+INSERT INTO WorkCenterStats (total_capacity) 
+VALUES (0);
+
+
+DELIMITER $$
+
+CREATE TRIGGER after_workcenter_insert
+AFTER INSERT ON WorkCenters
+FOR EACH ROW
+BEGIN
+    DECLARE new_total_capacity INT;
+
+    -- Calculate the new total capacity
+    SELECT SUM(capacity) INTO new_total_capacity FROM WorkCenters;
+
+    -- Update the WorkCenterStats table with the new total capacity
+    UPDATE WorkCenterStats
+    SET total_capacity = new_total_capacity;
+END $$
+
+DELIMITER ;
+
+
+-- Insert a new work center and check the WorkCenterStats
+INSERT INTO WorkCenters (work_center_id, work_center_name, capacity) 
+VALUES (4, 'Quality Control', 120);
+
+-- Verify the updated total capacity in WorkCenterStats
+SELECT * FROM WorkCenterStats;

@@ -1,0 +1,114 @@
+Implement the following MongoDb Query 
+    1. Create a collection named books. 
+    2. Insert 5 records with field TITLE,DESCRIPTION,BY,URL,TAGS AND LIKES 
+    3. Insert 1 more document in collection with additional field of user name and 
+comments. 
+    4. Display all the documents whose title is 'mongodb'. 
+    5. Display all the documents whose title is 'mongodb' and written by 'john'. 
+    6. Display all the documents whose like is greater than 100 and whose title is either 
+'mongodb' or written by 'john'. 
+    7. Delete the document titled 'nosql overview'. 
+    8. Display the second document published by 'john'. 
+    9. Update the Author of TOC book to Vivek Kulkarni, if record does not exist new 
+document should create
+
+Here are the MongoDB commands for your requested queries:
+
+1. **Create a collection named books**:
+   ```javascript
+   db.createCollection("books")
+   ```
+
+2. **Insert 5 records with fields TITLE, DESCRIPTION, BY, URL, TAGS, and LIKES**:
+   ```javascript
+   db.books.insertMany([
+     {
+       title: 'mongodb',
+       description: 'MongoDB CRUD operation',
+       author: 'geeksforgeeks',
+       url: 'www.mongodbpress.com',
+       tags: ['mongodb', 'database', 'NOSQL'],
+       likes: 150
+     },
+     {
+       title: 'nosql overview',
+       description: 'Introduction to NOSQL',
+       author: 'john',
+       url: 'www.mongodbpress.com',
+       tags: ['mongodb', 'database', 'NOSQL'],
+       likes: 1500
+     },
+     {
+       title: 'mongodb',
+       description: 'Introduction to mongoDB',
+       author: 'john',
+       url: 'www.mongodbpress.com',
+       tags: ['mongodb', 'database', 'NOSQL'],
+       likes: 1200
+     },
+     {
+       title: 'mongodb',
+       description: 'Introduction to mongoDB',
+       author: 'john',
+       url: 'www.mongodbpress.com',
+       tags: ['mongodb', 'database', 'NOSQL'],
+       likes: 100
+     },
+     {
+       title: 'nosql essentials',
+       description: 'Essentials of NoSQL Databases',
+       author: 'alice',
+       url: 'www.nosqlpress.com',
+       tags: ['NoSQL', 'database', 'MongoDB'],
+       likes: 200
+     }
+   ])
+   ```
+
+3. **Insert 1 more document with additional fields of username and comments**:
+   ```javascript
+   db.books.insertOne({
+     title: 'xyzc',
+     user_name: 'harsh5',
+     comments: 'Interesting read',
+     description: 'MongoDB is a NoSQL database',
+     author: 'tutorials point',
+     url: 'http://www.tutorialspoint.com',
+     tags: ['mongodb', 'database', 'NoSQL'],
+     likes: 100
+   })
+   ```
+
+4. **Display all the documents whose title is 'mongodb'**:
+   ```javascript
+   db.books.find({ title: 'mongodb' })
+   ```
+
+5. **Display all the documents whose title is 'mongodb' and written by 'john'**:
+   ```javascript
+   db.books.find({ $and: [{ title: 'mongodb' }, { author: 'john' }] })
+   ```
+
+6. **Display all the documents whose like is greater than 100 and whose title is either 'mongodb' or written by 'john'**:
+   ```javascript
+   db.books.find({ likes: { $gt: 100 }, $or: [{ title: 'mongodb' }, { author: 'john' }] })
+   ```
+
+7. **Delete the document titled 'nosql overview'**:
+   ```javascript
+   db.books.deleteOne({ title: 'nosql overview' })
+   ```
+
+8. **Display the second document published by 'john'**:
+   ```javascript
+   db.books.find({ author: 'john' }).skip(1).limit(1)
+   ```
+
+9. **Update the Author of the 'TOC' book to Vivek Kulkarni; if the record does not exist, a new document should be created**:
+   ```javascript
+   db.books.update(
+     { title: 'TOC' },
+     { $set: { author: 'Vivek Kulkarni' } },
+     { upsert: true }
+   )
+   ```

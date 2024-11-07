@@ -1,0 +1,125 @@
+Write a stored procedure for following scenario 
+Consider Tables: 
+1.Borrower(Roll_no, Name, DateofIssue, NameofBook, Status) 
+2.Fine(Roll_no,Date,Amt) 
+•Accept Roll_no and NameofBook from user. 
+•Check the number of days (from date of issue). 
+•If days are between 15 to 30 then fine amount will be Rs 5per day. 
+•If no. of days>30, per day fine will be Rs 50 per day. 
+•After submitting the book, status will change from I to R. 
+•If condition of fine is true, then details will be stored into fine table. 
+•Also handles the exception by named exception handler  
+    or user define exception handler. 
+
+
+
+### Sample Table Creation and Insertion
+
+```sql
+-- Borrower table
+CREATE TABLE Borrower (
+    Roll_no INT,
+    Name VARCHAR(50),
+    DateofIssue DATE,
+    NameofBook VARCHAR(100),
+    Status CHAR(1) -- 'I' for Issued, 'R' for Returned
+);
+
+-- Fine table
+CREATE TABLE Fine (
+    Roll_no INT,
+    Date DATE,
+    Amt DECIMAL(10, 2)
+);
+
+-- Sample data insertion
+INSERT INTO Borrower (Roll_no, Name, DateofIssue, NameofBook, Status)
+VALUES
+    (1, 'John Doe', '2023-10-01', 'SQL Fundamentals', 'I'),
+    (2, 'Jane Smith', '2023-09-20', 'Database Systems', 'I');
+
+INSERT INTO Fine (Roll_no, Date, Amt)
+VALUES
+    (2, '2023-10-21', 50);
+```
+
+### Stored Procedure
+
+Here's the stored procedure that accepts `Roll_no` and `NameofBook` as input and applies the required logic.
+
+```sql
+DELIMITER $$
+
+CREATE PROCEDURE CalculateFine(
+    IN p_Roll_no INT,
+    IN p_NameofBook VARCHAR(100)
+)
+BEGIN
+    DECLARE v_days INT;
+    DECLARE v_fine DECIMAL(10, 2);
+    DECLARE v_issue_date DATE;
+    DECLARE v_exception_handling INT DEFAULT 0;
+
+    -- Declare a custom exception handler
+    DECLARE CONTINUE HANDLER FOR SQLEXCEPTION
+    BEGIN
+        SET v_exception_handling = 1;
+    END;
+
+    -- Fetch the DateofIssue for the specific Roll_no and NameofBook
+    SELECT DateofIssue INTO v_issue_date
+    FROM Borrower
+    WHERE Roll_no = p_Roll_no AND NameofBook = p_NameofBook AND Status = 'I';
+
+    -- Calculate the days since issue
+    SET v_days = DATEDIFF(CURDATE(), v_issue_date);
+
+    -- Initialize fine amount
+    SET v_fine = 0;
+
+    -- Calculate fine based on days
+    IF v_days BETWEEN 15 AND 30 THEN
+        SET v_fine = v_days * 5;
+    ELSEIF v_days > 30 THEN
+        SET v_fine = v_days * 50;
+    END IF;
+
+    -- Check if there is a fine to be recorded
+    IF v_fine > 0 THEN
+        -- Insert the fine record
+        INSERT INTO Fine (Roll_no, Date, Amt) VALUES (p_Roll_no, CURDATE(), v_fine);
+    END IF;
+
+    -- Update the status of the book to Returned ('R')
+    UPDATE Borrower
+    SET Status = 'R'
+    WHERE Roll_no = p_Roll_no AND NameofBook = p_NameofBook AND Status = 'I';
+
+    -- Check for any exception that might have been triggered
+    IF v_exception_handling = 1 THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'An error occurred while processing the fine or updating the status.';
+    END IF;
+
+END $$
+
+DELIMITER ;
+```
+
+### Explanation of Procedure ####
+
+1. **Parameters**: `p_Roll_no` and `p_NameofBook` are the inputs.
+2. **Exception Handling**: Uses a named handler to catch any SQL exceptions.
+3. **Fetch Date**: Retrieves the issue date for the provided `Roll_no` and `NameofBook`.
+4. **Fine Calculation**:
+   - If the number of days is between 15 and 30, the fine is `5` per day.
+   - If it’s over 30 days, the fine is `50` per day.
+5. **Insert Fine Record**: Adds an entry in the `Fine` table if a fine is applicable.
+6. **Update Status**: Changes the status from `I` (Issued) to `R` (Returned).
+7. **Error Message**: Triggers a custom error message if an exception occurs.
+
+You can call this procedure as follows:
+
+```sql
+CALL CalculateFine(1, 'SQL Fundamentals');
+```

@@ -1,0 +1,74 @@
+Consider the given relational table:  
+ Employee(Emp_No,Emp_Name,Designation,City,Salary,Zipcode,County) 
+1. Creates a sequence used to generate employee numbers for the empno column of 
+the emp table. 
+2. Create an Index on county. 
+3. Find the zip code whose county = 071 and check whether the query uses the Index and 
+write your observation. 
+4. Create a view for employees having salary <50000 and stays in 'Mumbai'
+
+
+Below are the SQL queries to fulfill each of your requirements:
+
+### 1. Create a sequence to generate employee numbers for the `Emp_No` column in the `Employee` table.
+
+To create a sequence for the `Emp_No` column, we can use the `CREATE SEQUENCE` statement. This sequence will automatically generate unique employee numbers for new records.
+
+```sql
+CREATE SEQUENCE Emp_No_Seq
+START WITH 1
+INCREMENT BY 1
+NOCACHE;
+```
+
+- This will start the sequence from 1 and increment it by 1 for every new employee record.
+
+### 2. Create an Index on the `County` column.
+
+To create an index on the `County` column of the `Employee` table:
+
+```sql
+CREATE INDEX idx_county ON Employee(County);
+```
+
+- This index will help speed up queries that filter by `County`.
+
+### 3. Find the zip code whose county = 071 and check whether the query uses the index.
+
+First, let’s query the `Employee` table to find the zip code where the county is '071'. We can then observe if the index on `County` is being used by checking the execution plan.
+
+```sql
+SELECT Zipcode
+FROM Employee
+WHERE County = '071';
+```
+
+To check whether the index is being used, you can use the `EXPLAIN PLAN` statement (specific to Oracle or databases that support it):
+
+```sql
+EXPLAIN PLAN FOR
+SELECT Zipcode
+FROM Employee
+WHERE County = '071';
+```
+
+- After running the `EXPLAIN PLAN` statement, you can check the query plan to see if the `idx_county` index is being used. If the index is being used, you should see something indicating the use of the `idx_county` index.
+
+### 4. Create a view for employees having a salary < 50000 and staying in 'Mumbai'.
+
+A view allows you to store a SQL query and access it like a table. Here’s how you can create a view for employees with a salary less than 50,000 who stay in Mumbai.
+
+```sql
+CREATE VIEW Mumbai_Low_Salary_Employees AS
+SELECT Emp_No, Emp_Name, Designation, City, Salary, Zipcode, County
+FROM Employee
+WHERE Salary < 50000 AND City = 'Mumbai';
+```
+
+- This view filters employees based on salary and city, and it can be queried like a table. For example, you can retrieve all employees in the view with:
+
+```sql
+SELECT * FROM Mumbai_Low_Salary_Employees;
+```
+
+---

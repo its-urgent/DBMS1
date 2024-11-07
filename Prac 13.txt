@@ -1,0 +1,122 @@
+Consider the given Database Schema: 
+ employee (employee-name, street, city) 
+ works (employee-name, company-name, salary) 
+ company (company-name, city) 
+ manages (employee-name, manager-name) 
+ Find the names and cities of residence of all employees who work for First Bank 
+Corporation. 
+ Find all employees in the database who live in the same cities as the companies 
+for which      
+they work. 
+ Find all employees in the database who do not work for First Bank Corporation. 
+ Assume that the companies may be located in several cities. Find all companies 
+located in     every city in which Small Bank Corporation is located. 
+ Find the company that has the most employees. 
+ Find those companies whose employees earn a higher salary, on average, than 
+the average salary at First Bank Corporation.
+
+
+
+### Table Creation and Insertion (for reference):
+```sql
+CREATE TABLE employee (
+    employee_name VARCHAR(255),
+    street VARCHAR(255),
+    city VARCHAR(255)
+);
+
+CREATE TABLE works (
+    employee_name VARCHAR(255),
+    company_name VARCHAR(255),
+    salary DECIMAL(10, 2)
+);
+
+CREATE TABLE company (
+    company_name VARCHAR(255),
+    city VARCHAR(255)
+);
+
+CREATE TABLE manages (
+    employee_name VARCHAR(255),
+    manager_name VARCHAR(255)
+);
+
+-- Sample Insert Data (for demonstration purposes)
+INSERT INTO employee VALUES 
+('John Doe', '123 Elm St', 'Chicago'),
+('Jane Smith', '456 Oak St', 'New York');
+
+INSERT INTO works VALUES
+('John Doe', 'First Bank Corporation', 60000),
+('Jane Smith', 'Small Bank Corporation', 55000);
+
+INSERT INTO company VALUES
+('First Bank Corporation', 'Chicago'),
+('Small Bank Corporation', 'New York');
+
+INSERT INTO manages VALUES
+('John Doe', 'Robert Brown'),
+('Jane Smith', 'Nancy Green');
+```
+
+### Queries:
+
+1. **Find the names and cities of residence of all employees who work for "First Bank Corporation".**
+```sql
+SELECT e.employee_name, e.city
+FROM employee e
+JOIN works w ON e.employee_name = w.employee_name
+WHERE w.company_name = 'First Bank Corporation';
+```
+
+2. **Find all employees in the database who live in the same cities as the companies for which they work.**
+```sql
+SELECT e.employee_name, e.city
+FROM employee e
+JOIN works w ON e.employee_name = w.employee_name
+JOIN company c ON w.company_name = c.company_name
+WHERE e.city = c.city;
+```
+
+3. **Find all employees in the database who do not work for "First Bank Corporation".**
+```sql
+SELECT e.employee_name, e.city
+FROM employee e
+JOIN works w ON e.employee_name = w.employee_name
+WHERE w.company_name != 'First Bank Corporation';
+```
+
+4. **Find all companies located in every city in which "Small Bank Corporation" is located.**
+```sql
+SELECT c.company_name
+FROM company c
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM company c2
+    WHERE c2.company_name = 'Small Bank Corporation'
+    AND c2.city NOT IN (SELECT c.city FROM company c WHERE c.company_name = c2.company_name)
+);
+```
+
+5. **Find the company that has the most employees.**
+```sql
+SELECT w.company_name
+FROM works w
+GROUP BY w.company_name
+ORDER BY COUNT(w.employee_name) DESC
+LIMIT 1;
+```
+
+6. **Find those companies whose employees earn a higher salary, on average, than the average salary at "First Bank Corporation".**
+```sql
+SELECT w.company_name
+FROM works w
+GROUP BY w.company_name
+HAVING AVG(w.salary) > (
+    SELECT AVG(salary) 
+    FROM works 
+    WHERE company_name = 'First Bank Corporation'
+);
+```
+
+These queries should cover all the requested scenarios based on the database schema you provided.

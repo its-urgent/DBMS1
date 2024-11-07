@@ -1,0 +1,105 @@
+Implement the following MongoDb Query  
+1. Create a collection named books.  
+2. Insert 5 records with field TITLE,DESCRIPTION,BY,URL,TAGS AND LIKES  
+3. Insert 1 more document in collection with additional field of user name and comments.  
+4. Display all the documents written by 'john' or whose title is 'mongodb'.  
+5. Display all the documents whose like is greater than 150..  
+6. Update the title of 'mongodb' document to 'mongodb overview'  
+7. Display exactly two documents written by 'john'.  
+8. Display all the books in the sorted fashion. 
+
+Here are the MongoDB commands for the specified queries:
+
+1. **Create a collection named books**  
+   ```js
+   db.createCollection("books")
+   ```
+
+2. **Insert 5 records with field TITLE, DESCRIPTION, BY, URL, TAGS AND LIKES**  
+   ```js
+   db.books.insertMany([
+     {
+       title: 'mongodb',
+       description: 'MongoDB CRUD operation',
+       author: 'geeksforgeeks',
+       url: 'www.mongodbpress.com',
+       tags: ['mongodb', 'database', 'NOSQL'],
+       likes: 150
+     },
+     {
+       title: 'nosql overview',
+       description: 'Introduction to NOSQL',
+       author: 'john',
+       url: 'www.mongodbpress.com',
+       tags: ['mongodb', 'database', 'NOSQL'],
+       likes: 1500
+     },
+     {
+       title: 'mongodb',
+       description: 'Introduction to MongoDB',
+       author: 'john',
+       url: 'www.mongodbpress.com',
+       tags: ['mongodb', 'database', 'NOSQL'],
+       likes: 1200
+     },
+     {
+       title: 'mongodb',
+       description: 'Advanced MongoDB features',
+       author: 'john',
+       url: 'www.mongodbpress.com',
+       tags: ['mongodb', 'database', 'NOSQL'],
+       likes: 100
+     },
+     {
+       title: 'nosql trends',
+       description: 'Trends in NoSQL databases',
+       author: 'mary',
+       url: 'www.nosqltrends.com',
+       tags: ['nosql', 'database'],
+       likes: 300
+     }
+   ])
+   ```
+
+3. **Insert 1 more document with additional fields user name and comments**  
+   ```js
+   db.books.insertOne({
+     title: 'xyzc',
+     user_name: 'harsh5',
+     comments: 'great read',
+     description: 'MongoDB is a NoSQL database',
+     author: 'tutorials point',
+     url: 'http://www.tutorialspoint.com',
+     tags: ['mongodb', 'database', 'NoSQL'],
+     likes: 100
+   })
+   ```
+
+4. **Display all the documents written by 'john' or whose title is 'mongodb'**  
+   ```js
+   db.books.find({$or: [{title: 'mongodb'}, {author: 'john'}]})
+   ```
+
+5. **Display all the documents whose like is greater than 150**  
+   ```js
+   db.books.find({likes: {$gt: 150}})
+   ```
+
+6. **Update the title of 'mongodb' document to 'mongodb overview'**  
+   ```js
+   db.books.updateMany({title: 'mongodb'}, {$set: {title: 'mongodb overview'}})
+   ```
+
+7. **Display exactly two documents written by 'john'**  
+   ```js
+   db.books.find({author: 'john'}).limit(2)
+   ```
+
+8. **Display all the books in the sorted fashion (by likes, descending)**  
+   ```js
+   db.books.find().sort({likes: -1})  // Descending order
+   ```  
+   or for ascending order:  
+   ```js
+   db.books.find().sort({likes: 1})  // Ascending order
+   ```

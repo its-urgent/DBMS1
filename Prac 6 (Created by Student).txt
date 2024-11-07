@@ -1,0 +1,119 @@
+Write a PL/SQL block of code using Cursor that will give 5000 bonus to the employee 
+whose salary is greater than 4000 and bonus of 1000 to the employee whose salary is less 
+than 4000.  
+Use Table : Emp (eno,name,city,salary) 
+
+
+CREATE TABLE Emp (
+    empno INT PRIMARY KEY,
+    name VARCHAR(50),
+    city VARCHAR(50),
+    salary DECIMAL(10, 2)
+);
+
+INSERT INTO Emp (empno, name, city, salary)
+VALUES
+    (101, 'Alice Johnson', 'New York', 4500),
+    (102, 'Bob Smith', 'Los Angeles', 3900),
+    (103, 'Cathy Brown', 'Chicago', 5000),
+    (104, 'David Wilson', 'Houston', 3200),
+    (105, 'Eva Miller', 'Phoenix', 4100),
+    (106, 'Frank Thomas', 'Philadelphia', 3600),
+    (107, 'Grace Lee', 'San Antonio', 4200),
+    (108, 'Hannah Taylor', 'San Diego', 2800),
+    (109, 'Irene Martinez', 'Dallas', 4700),
+    (110, 'Jack White', 'San Jose', 3400);
+
+delimiter #
+CREATE PROCEDURE ApplyBonus()
+BEGIN
+DECLARE done INT DEFAULT 0;
+DECLARE emp_no INT;
+DECLARE emp_salary DECIMAL(10, 2);
+DECLARE emp_bonus INT;
+DECLARE emp_cursor CURSOR FOR
+SELECT empno, salary FROM Emp;
+DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = 1;
+OPEN emp_cursor;
+read_loop: LOOP
+FETCH emp_cursor INTO emp_no, emp_salary;
+IF done = 1 THEN
+LEAVE read_loop;
+END IF;
+IF emp_salary > 4000 THEN
+SET emp_bonus = 5000;
+ELSE
+SET emp_bonus = 1000;
+END IF;
+UPDATE Emp
+SET salary = salary + emp_bonus
+WHERE empno = emp_no;
+END LOOP;
+CLOSE emp_cursor;
+COMMIT;
+END
+#
+
+delimiter ;
+
+CALL ApplyBonus();
+
+SELECT empno, name, salary
+FROM Emp;
+
+
+
+
+OOOORRRRRRRRRR (IF External asks why no for loop is used use below code) (TBH THEY WONT SEE MUCH AND IDK IF DOWN CODE WORKS SO BETTER STICK UPWARDS)
+
+
+CREATE TABLE Emp (
+    empno INT PRIMARY KEY,
+    name VARCHAR(50),
+    city VARCHAR(50),
+    salary DECIMAL(10, 2)
+);
+
+INSERT INTO Emp (empno, name, city, salary)
+VALUES
+    (101, 'Alice Johnson', 'New York', 4500),
+    (102, 'Bob Smith', 'Los Angeles', 3900),
+    (103, 'Cathy Brown', 'Chicago', 5000),
+    (104, 'David Wilson', 'Houston', 3200),
+    (105, 'Eva Miller', 'Phoenix', 4100),
+    (106, 'Frank Thomas', 'Philadelphia', 3600),
+    (107, 'Grace Lee', 'San Antonio', 4200),
+    (108, 'Hannah Taylor', 'San Diego', 2800),
+    (109, 'Irene Martinez', 'Dallas', 4700),
+    (110, 'Jack White', 'San Jose', 3400);
+
+DECLARE
+    CURSOR emp_cursor IS
+        SELECT empno, name, salary
+        FROM Emp;
+    
+    v_bonus DECIMAL(10, 2);  -- Variable to store bonus
+BEGIN
+    -- Loop through each employee record using the cursor
+    FOR emp_rec IN emp_cursor LOOP
+        -- Determine the bonus based on salary
+        IF emp_rec.salary > 4000 THEN
+            v_bonus := 5000;
+        ELSE
+            v_bonus := 1000;
+        END IF;
+
+        -- Update the employee with the calculated bonus
+        UPDATE Emp
+        SET salary = salary + v_bonus
+        WHERE empno = emp_rec.empno;
+
+        -- Output the updated employee salary with bonus
+        DBMS_OUTPUT.PUT_LINE('Employee ' || emp_rec.name || ' (Empno: ' || emp_rec.empno || ') has received a bonus of ' || v_bonus || '. New Salary: ' || (emp_rec.salary + v_bonus));
+    END LOOP;
+
+    -- Commit the changes to the database
+    COMMIT;
+END;
+/
+

@@ -1,0 +1,110 @@
+Create a Library database with the schema  
+Books(AccNo,Title,Author,Publisher,Count).  
+ Create a table Library_Audit with same fields as of Books. 
+ Create a before trigger to insert records into Librry_Audit table if there is deletion 
+in Books table. 
+ Create a after trigger to insert records into Librry_Audit table if there is updation 
+in Books table. 
+
+
+To fulfill the requirements of your SQL queries, let's break it down step by step.
+
+### 1. Create a `Books` table
+
+```sql
+CREATE DATABASE Library;
+
+USE Library;
+
+CREATE TABLE Books (
+    AccNo INT PRIMARY KEY,
+    Title VARCHAR(255),
+    Author VARCHAR(255),
+    Publisher VARCHAR(255),
+    Count INT
+);
+```
+
+### 2. Create a `Library_Audit` table
+
+This table will have the same schema as the `Books` table. It will store the records of books that are deleted or updated in the `Books` table.
+
+```sql
+CREATE TABLE Library_Audit (
+    AccNo INT,
+    Title VARCHAR(255),
+    Author VARCHAR(255),
+    Publisher VARCHAR(255),
+    Count INT,
+    Operation VARCHAR(10), -- This will store the type of operation (DELETE/UPDATE)
+    Operation_Date DATETIME DEFAULT CURRENT_TIMESTAMP -- This stores the timestamp of the operation
+);
+```
+
+### 3. Create a **Before Trigger** to insert records into `Library_Audit` table on deletion from `Books`
+
+This trigger will execute before any deletion in the `Books` table. It will capture the deleted record and insert it into `Library_Audit` with the `DELETE` operation.
+
+```sql
+DELIMITER $$
+
+CREATE TRIGGER before_delete_books
+BEFORE DELETE ON Books
+FOR EACH ROW
+BEGIN
+    INSERT INTO Library_Audit (AccNo, Title, Author, Publisher, Count, Operation)
+    VALUES (OLD.AccNo, OLD.Title, OLD.Author, OLD.Publisher, OLD.Count, 'DELETE');
+END $$
+
+DELIMITER ;
+```
+
+### 4. Create an **After Trigger** to insert records into `Library_Audit` table on update in `Books`
+
+This trigger will execute after any update on the `Books` table. It will capture the old record and insert it into `Library_Audit` with the `UPDATE` operation.
+
+```sql
+DELIMITER $$
+
+CREATE TRIGGER after_update_books
+AFTER UPDATE ON Books
+FOR EACH ROW
+BEGIN
+    INSERT INTO Library_Audit (AccNo, Title, Author, Publisher, Count, Operation)
+    VALUES (OLD.AccNo, OLD.Title, OLD.Author, OLD.Publisher, OLD.Count, 'UPDATE');
+END $$
+
+DELIMITER ;
+```
+
+### Example of inserting data into `Books` table
+
+For testing purposes, you can insert sample records into the `Books` table:
+
+```sql
+INSERT INTO Books (AccNo, Title, Author, Publisher, Count)
+VALUES
+(1, 'To Kill a Mockingbird', 'Harper Lee', 'J.B. Lippincott & Co.', 10),
+(2, '1984', 'George Orwell', 'Secker & Warburg', 5),
+(3, 'The Great Gatsby', 'F. Scott Fitzgerald', 'Charles Scribner\'s Sons', 3);
+```
+
+### Example of updating and deleting records
+
+You can test the triggers with some updates and deletions:
+
+```sql
+-- Update an existing book
+UPDATE Books
+SET Count = 8
+WHERE AccNo = 1;
+
+-- Delete a book
+DELETE FROM Books
+WHERE AccNo = 2;
+```
+
+### Expected behavior:
+
+1. When you **delete** a book from the `Books` table, the `before_delete_books` trigger will insert the deleted record into the `Library_Audit` table with the `DELETE` operation.
+2. When you **update** a book in the `Books` table, the `after_update_books` trigger will insert the old (before update) record into the `Library_Audit` table with the `UPDATE` operation.

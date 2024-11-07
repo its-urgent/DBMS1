@@ -1,0 +1,60 @@
+Consider the given database schema: 
+Student(Student_Id,Student_Name,Instructor_Id,Student_City) 
+Instructor(Instructor_Id,Instructor_Name,Instructor_City,Specialization)  
+1. Find the instructor of each student.  
+2. Find the student who is not having any instructor.  
+3. Find the student who is not having any instructor as well as instructor who is not 
+having student.  
+4. Find the students whose instructor’s specialization is computer.  
+5. Create a view containing total number of students whose instructor belongs to “Pune”.
+
+
+
+### 1. Find the instructor of each student.
+```sql
+SELECT s.Student_Id, s.Student_Name, i.Instructor_Name
+FROM Student s
+JOIN Instructor i ON s.Instructor_Id = i.Instructor_Id;
+```
+
+### 2. Find the student who is not having any instructor.
+```sql
+SELECT s.Student_Id, s.Student_Name
+FROM Student s
+LEFT JOIN Instructor i ON s.Instructor_Id = i.Instructor_Id
+WHERE s.Instructor_Id IS NULL;
+```
+
+### 3. Find the student who is not having any instructor as well as instructor who is not having any student.
+```sql
+-- Students without instructors
+SELECT s.Student_Id, s.Student_Name
+FROM Student s
+LEFT JOIN Instructor i ON s.Instructor_Id = i.Instructor_Id
+WHERE s.Instructor_Id IS NULL;
+
+-- Instructors without students
+SELECT i.Instructor_Id, i.Instructor_Name
+FROM Instructor i
+LEFT JOIN Student s ON i.Instructor_Id = s.Instructor_Id
+WHERE s.Student_Id IS NULL;
+```
+
+### 4. Find the students whose instructor’s specialization is computer.
+```sql
+SELECT s.Student_Id, s.Student_Name
+FROM Student s
+JOIN Instructor i ON s.Instructor_Id = i.Instructor_Id
+WHERE i.Specialization = 'Computer';
+```
+
+### 5. Create a view containing the total number of students whose instructor belongs to “Pune”.
+```sql
+CREATE VIEW StudentsFromPune AS
+SELECT COUNT(s.Student_Id) AS Total_Students
+FROM Student s
+JOIN Instructor i ON s.Instructor_Id = i.Instructor_Id
+WHERE i.Instructor_City = 'Pune';
+```
+
+These queries cover the operations based on the schema provided. If you need some sample data to insert into these tables for testing, let me know!

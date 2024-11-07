@@ -1,0 +1,100 @@
+Consider the given Database Schema: 
+ employee (employee-name, street, city) 
+ works (employee-name, company-name, salary) 
+ company (company-name, city) 
+ manages (employee-name, manager-name) 
+ Find the names of all employees who work for First Bank Corporation. 
+ Find the names, street addresses, and cities of residence of all employees 
+ who work for First Bank Corporation and earn more than $10,000. 
+ Find all employees in the database who live in the same cities and on the 
+ same streets as do their managers. 
+ Find all employees in the database who earn more than each employee of Small 
+Bank Corporation. 
+ Find all employees who earn more than the average salary of all employees of 
+their company. 
+ Find the company that has the smallest payroll.
+
+
+
+Here are SQL queries based on the schema provided:
+
+### 1. Find the names of all employees who work for First Bank Corporation:
+```sql
+SELECT employee-name
+FROM works
+WHERE company-name = 'First Bank Corporation';
+```
+
+### 2. Find the names, street addresses, and cities of residence of all employees who work for First Bank Corporation and earn more than $10,000:
+```sql
+SELECT e.employee-name, e.street, e.city
+FROM employee e
+JOIN works w ON e.employee-name = w.employee-name
+WHERE w.company-name = 'First Bank Corporation' AND w.salary > 10000;
+```
+
+### 3. Find all employees in the database who live in the same cities and on the same streets as their managers:
+```sql
+SELECT e.employee-name
+FROM employee e
+JOIN manages m ON e.employee-name = m.employee-name
+JOIN employee manager ON m.manager-name = manager.employee-name
+WHERE e.street = manager.street AND e.city = manager.city;
+```
+
+### 4. Find all employees in the database who earn more than each employee of Small Bank Corporation:
+```sql
+SELECT e.employee-name
+FROM works e
+WHERE e.salary > ALL (
+    SELECT salary
+    FROM works
+    WHERE company-name = 'Small Bank Corporation'
+);
+```
+
+### 5. Find all employees who earn more than the average salary of all employees of their company:
+```sql
+SELECT e.employee-name
+FROM works e
+WHERE e.salary > (
+    SELECT AVG(salary)
+    FROM works
+    WHERE company-name = e.company-name
+);
+```
+
+### 6. Find the company that has the smallest payroll:
+```sql
+SELECT company-name
+FROM works
+GROUP BY company-name
+ORDER BY SUM(salary) ASC
+LIMIT 1;
+```
+
+### For reference, here are the SQL `INSERT` statements to populate sample data into the tables:
+
+```sql
+-- Insert data into employee table
+INSERT INTO employee (employee-name, street, city) VALUES
+('John Doe', '123 Elm St', 'New York'),
+('Jane Smith', '456 Oak St', 'Los Angeles'),
+('James Brown', '789 Pine St', 'Chicago');
+
+-- Insert data into works table
+INSERT INTO works (employee-name, company-name, salary) VALUES
+('John Doe', 'First Bank Corporation', 15000),
+('Jane Smith', 'First Bank Corporation', 12000),
+('James Brown', 'Small Bank Corporation', 8000);
+
+-- Insert data into company table
+INSERT INTO company (company-name, city) VALUES
+('First Bank Corporation', 'New York'),
+('Small Bank Corporation', 'Los Angeles');
+
+-- Insert data into manages table
+INSERT INTO manages (employee-name, manager-name) VALUES
+('John Doe', 'Jane Smith'),
+('Jane Smith', 'James Brown');
+```

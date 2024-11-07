@@ -1,0 +1,126 @@
+Create the collection books having the following fields    TITLE, DESCRIPTION, AUTHOR, 
+URL, TAGS AND LIKES. 
+      Implement the following Aggregation and Indexing Queries  
+    1. Find the number of books published author john. 
+    2. Find books which have minimum likes and maximum likes published author john. 
+    3. Find the average number of likes of the books published author john. 
+    4. Find the first and last book published author john.. 
+    5. Create an index on author name. 
+Display the books published author john and check if it uses the index which we have 
+created 
+
+
+
+### 1. **Create the collection `books`**
+
+```javascript
+db.createCollection("books")
+
+// Insert sample documents
+db.books.insertMany([
+  { 
+    title: "MongoDB Overview", 
+    description: "An introduction to MongoDB", 
+    author: "john", 
+    url: "https://example.com/mongo-overview", 
+    tags: ["database", "mongodb"], 
+    likes: 50 
+  },
+  { 
+    title: "NoSQL in Action", 
+    description: "The power of NoSQL databases", 
+    author: "john", 
+    url: "https://example.com/nosql-action", 
+    tags: ["database", "nosql"], 
+    likes: 100 
+  },
+  { 
+    title: "Advanced MongoDB", 
+    description: "Deep dive into MongoDB", 
+    author: "jane", 
+    url: "https://example.com/advanced-mongo", 
+    tags: ["database", "mongodb"], 
+    likes: 200 
+  }
+])
+```
+
+### 2. **Find the number of books published by author "john"**
+
+```javascript
+db.books.aggregate([
+  { $match: { author: "john" } },
+  { $group: { _id: "$author", no_of_documents: { $sum: 1 } } }
+])
+```
+
+### 3. **Find books with minimum and maximum likes published by author "john"**
+
+```javascript
+// Minimum likes
+db.books.aggregate([
+  { $match: { author: "john" } },
+  { $group: { _id: "$author", minimum_likes: { $min: "$likes" } } }
+])
+
+// Maximum likes
+db.books.aggregate([
+  { $match: { author: "john" } },
+  { $group: { _id: "$author", maximum_likes: { $max: "$likes" } } }
+])
+```
+
+### 4. **Find the average number of likes of books published by author "john"**
+
+```javascript
+db.books.aggregate([
+  { $match: { author: "john" } },
+  { $group: { _id: "$author", avg_likes: { $avg: "$likes" } } }
+])
+```
+
+### 5. **Find the first and last book published by author "john"**
+
+```javascript
+// First book
+db.books.aggregate([
+  { $match: { author: "john" } },
+  { $group: { _id: "$author", first_book: { $first: "$title" } } }
+])
+
+// Last book
+db.books.aggregate([
+  { $match: { author: "john" } },
+  { $group: { _id: "$author", last_book: { $last: "$title" } } }
+])
+```
+
+### 6. **Create an index on author name**
+
+```javascript
+db.books.createIndex({ "author": 1 })
+```
+
+### 7. **Display books published by author "john" and check if it uses the index**
+
+```javascript
+// Display books by author "john"
+db.books.find({ author: "john" })
+
+// Check if the query is using the index on author
+db.books.getIndexes()
+```
+
+---
+
+This sequence of commands:
+
+- Creates the `books` collection and inserts some sample documents.
+- Implements aggregation queries to:
+  - Count books by author "john".
+  - Find books with minimum and maximum likes by "john".
+  - Find the average number of likes of books by "john".
+  - Get the first and last book published by "john".
+- Creates an index on the `author` field and verifies the use of the index during a query.
+
+Let me know if you need further clarification or adjustments!

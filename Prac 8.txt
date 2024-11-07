@@ -1,0 +1,213 @@
+IF THIS IS YOUR PRACTICAL I ALREADY FEEL SORRY JUST WALKTHROUGH IF U CAN GET IT
+
+To implement MySQL/Oracle database connectivity and perform database navigation operations (like add, delete, edit) using a front-end language, I'll demonstrate the process with **Python** as the front-end language using the **MySQL** database. The process would be quite similar if you were using **Oracle**, with slight changes to the database connection.
+
+### Prerequisites:
+1. Install MySQL and the required Python library `mysql-connector-python`:
+   ```bash
+   pip install mysql-connector-python
+   ```
+
+2. Make sure MySQL server is running and that you have access credentials (username, password, and database name).
+
+---
+
+### 1. **Setting up the Database** (MySQL):
+
+Let’s assume you have a database `company_db` and a table `employees`.
+
+```sql
+-- Create the company database
+CREATE DATABASE company_db;
+
+-- Use the database
+USE company_db;
+
+-- Create the employees table
+CREATE TABLE employees (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255),
+    position VARCHAR(255),
+    salary DECIMAL(10, 2)
+);
+
+-- Insert some initial data
+INSERT INTO employees (name, position, salary) VALUES 
+('John Doe', 'Software Engineer', 80000),
+('Jane Smith', 'Project Manager', 90000);
+```
+
+---
+
+### 2. **Python Code for Database Operations (Add, Delete, Edit)**
+
+The following Python code demonstrates how to connect to the MySQL database and implement CRUD operations.
+
+```python
+import mysql.connector
+
+# Establish connection to the MySQL database
+def connect_to_db():
+    return mysql.connector.connect(
+        host="localhost",
+        user="root",  # Replace with your username
+        password="password",  # Replace with your password
+        database="company_db"  # Replace with your database name
+    )
+
+# Function to add a new employee
+def add_employee(name, position, salary):
+    db = connect_to_db()
+    cursor = db.cursor()
+
+    sql_query = "INSERT INTO employees (name, position, salary) VALUES (%s, %s, %s)"
+    values = (name, position, salary)
+
+    cursor.execute(sql_query, values)
+    db.commit()
+    print(f"Employee {name} added successfully.")
+    
+    cursor.close()
+    db.close()
+
+# Function to delete an employee by ID
+def delete_employee(employee_id):
+    db = connect_to_db()
+    cursor = db.cursor()
+
+    sql_query = "DELETE FROM employees WHERE id = %s"
+    cursor.execute(sql_query, (employee_id,))
+    db.commit()
+    print(f"Employee with ID {employee_id} deleted successfully.")
+    
+    cursor.close()
+    db.close()
+
+# Function to update an employee's details
+def update_employee(employee_id, name, position, salary):
+    db = connect_to_db()
+    cursor = db.cursor()
+
+    sql_query = "UPDATE employees SET name = %s, position = %s, salary = %s WHERE id = %s"
+    values = (name, position, salary, employee_id)
+
+    cursor.execute(sql_query, values)
+    db.commit()
+    print(f"Employee with ID {employee_id} updated successfully.")
+    
+    cursor.close()
+    db.close()
+
+# Function to view all employees
+def view_employees():
+    db = connect_to_db()
+    cursor = db.cursor()
+
+    sql_query = "SELECT * FROM employees"
+    cursor.execute(sql_query)
+    
+    rows = cursor.fetchall()
+    print("Employees List:")
+    for row in rows:
+        print(f"ID: {row[0]}, Name: {row[1]}, Position: {row[2]}, Salary: {row[3]}")
+
+    cursor.close()
+    db.close()
+
+# Main function to interact with the user
+def main():
+    while True:
+        print("\nChoose an operation:")
+        print("1. Add Employee")
+        print("2. Delete Employee")
+        print("3. Update Employee")
+        print("4. View All Employees")
+        print("5. Exit")
+        
+        choice = input("Enter your choice: ")
+
+        if choice == '1':
+            name = input("Enter employee name: ")
+            position = input("Enter employee position: ")
+            salary = float(input("Enter employee salary: "))
+            add_employee(name, position, salary)
+
+        elif choice == '2':
+            employee_id = int(input("Enter employee ID to delete: "))
+            delete_employee(employee_id)
+
+        elif choice == '3':
+            employee_id = int(input("Enter employee ID to update: "))
+            name = input("Enter new name: ")
+            position = input("Enter new position: ")
+            salary = float(input("Enter new salary: "))
+            update_employee(employee_id, name, position, salary)
+
+        elif choice == '4':
+            view_employees()
+
+        elif choice == '5':
+            print("Exiting program.")
+            break
+
+        else:
+            print("Invalid choice, please try again.")
+
+if __name__ == "__main__":
+    main()
+```
+
+---
+
+### 3. **Explanation of the Code:**
+
+1. **Database Connection (`connect_to_db`)**: 
+   - Establishes a connection to the MySQL database using `mysql.connector`.
+   - You need to replace the credentials with your own database details.
+
+2. **CRUD Functions**:
+   - `add_employee`: Adds a new employee to the `employees` table.
+   - `delete_employee`: Deletes an employee based on the employee ID.
+   - `update_employee`: Updates an employee’s details by ID.
+   - `view_employees`: Fetches and displays all employee records.
+
+3. **User Interaction (Main Function)**:
+   - The program uses a while-loop to keep the user engaged and ask for various operations (add, delete, edit, view, exit).
+   - Based on the user's input, it calls the respective function.
+
+---
+
+### 4. **Running the Program**:
+1. Ensure the MySQL server is running, and you have the database and table set up.
+2. Save the Python script and run it using:
+   ```bash
+   python your_script_name.py
+   ```
+
+3. The user will be prompted to select an operation, and CRUD operations can be performed interactively.
+
+---
+
+### 5. **For Oracle Database**:
+To use Oracle, you would need to use the `cx_Oracle` library for Python:
+
+```bash
+pip install cx_Oracle
+```
+
+And modify the connection code accordingly:
+
+```python
+import cx_Oracle
+
+# Function to connect to the Oracle database
+def connect_to_db():
+    return cx_Oracle.connect('username/password@localhost:1521/ORCL')
+```
+
+The rest of the program remains mostly the same, with only the database connection method changing.
+
+---
+
+This example demonstrates the fundamentals of connecting to a MySQL or Oracle database using Python and performing basic CRUD operations interactively through the command line.
+

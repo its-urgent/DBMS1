@@ -1,0 +1,108 @@
+Consider Following Schema   
+Employee (Employee_id, First_name, last_name , hire_date, salary,  
+Job_title, manager_id, department_id)   
+Departments(Department_id, Department_name, Manager_id,  
+Location_id)   
+Locations(location_id ,street_address ,postal_code, city, state, country_id)  
+1. Write a query to find the names (first_name, last_name) and the salaries  
+of the employees who have a higher salary than the employee whose  
+last_name=''Singh”.   
+2. Write a query to find the names (first_name, last_name) of the  
+employees who have a manager and work for a department based in the  
+United States.   
+3. Find the names of all employees who works in the IT department.   
+4. Write a query to find the names (first_name, last_name), the salary of  
+the employees whose salary is greater than the average salary.   
+5. Write a query to find the names (first_name, last_name), the salary of  
+the employees who earn more than the average salary and who works in  
+any of the IT departments
+
+
+
+
+### Sample Data Inserts
+
+Here are some sample inserts to populate the tables with basic data:
+
+```sql
+-- Departments table
+INSERT INTO Departments (Department_id, Department_name, Manager_id, Location_id)
+VALUES 
+(1, 'IT', 101, 1),
+(2, 'HR', 102, 2),
+(3, 'Sales', 103, 3);
+
+-- Locations table
+INSERT INTO Locations (Location_id, street_address, postal_code, city, state, country_id)
+VALUES 
+(1, '123 Tech Park', '94043', 'Mountain View', 'CA', 'US'),
+(2, '456 HR Blvd', '94044', 'San Francisco', 'CA', 'US'),
+(3, '789 Sales Ave', '10001', 'New York', 'NY', 'US');
+
+-- Employee table
+INSERT INTO Employee (Employee_id, First_name, Last_name, hire_date, salary, Job_title, manager_id, department_id)
+VALUES 
+(201, 'John', 'Doe', '2022-01-01', 60000, 'Developer', 101, 1),
+(202, 'Jane', 'Smith', '2023-01-01', 50000, 'HR Specialist', 102, 2),
+(203, 'Michael', 'Johnson', '2022-06-01', 70000, 'IT Manager', NULL, 1),
+(204, 'Amit', 'Singh', '2021-01-01', 55000, 'Developer', 101, 1),
+(205, 'Emily', 'Brown', '2023-03-01', 75000, 'Sales Rep', 103, 3);
+```
+
+
+### 1. Query to Find Employees with a Higher Salary than Employee 'Singh'
+
+```sql
+SELECT e.first_name, e.last_name, e.salary
+FROM Employee e
+WHERE e.salary > (
+    SELECT salary
+    FROM Employee
+    WHERE last_name = 'Singh'
+);
+```
+
+### 2. Query to Find Employees with a Manager and Work in a Department Based in the United States
+
+```sql
+SELECT e.first_name, e.last_name
+FROM Employee e
+JOIN Departments d ON e.department_id = d.department_id
+JOIN Locations l ON d.location_id = l.location_id
+WHERE e.manager_id IS NOT NULL
+AND l.country_id = 'US';
+```
+
+### 3. Query to Find Employees Working in the IT Department
+
+```sql
+SELECT e.first_name, e.last_name
+FROM Employee e
+JOIN Departments d ON e.department_id = d.department_id
+WHERE d.department_name = 'IT';
+```
+
+### 4. Query to Find Employees with a Salary Greater Than the Average Salary
+
+```sql
+SELECT e.first_name, e.last_name, e.salary
+FROM Employee e
+WHERE e.salary > (
+    SELECT AVG(salary)
+    FROM Employee
+);
+```
+
+### 5. Query to Find Employees with a Salary Greater Than the Average Salary and Working in IT
+
+```sql
+SELECT e.first_name, e.last_name, e.salary
+FROM Employee e
+JOIN Departments d ON e.department_id = d.department_id
+WHERE e.salary > (
+    SELECT AVG(salary)
+    FROM Employee
+)
+AND d.department_name = 'IT';
+```
+

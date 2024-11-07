@@ -1,0 +1,58 @@
+
+
+CREATE TABLE borrower (
+    rollin INT,
+    name VARCHAR(50),
+    dateofIssue DATE,
+    bname VARCHAR(100),
+    status CHAR(1)
+);
+
+CREATE TABLE fine (
+    rollno INT,
+    fdate DATE,
+    amt int
+);
+
+INSERT INTO Borrower (rollin, name, dateofIssue, bname, status)
+VALUES
+    (1, 'John Doe', '2023-10-01', 'SQL Fundamentals', 'I'),
+    (2, 'Jane Smith', '2023-09-20', 'Database Systems', 'I'),
+    (3, 'Alice Johnson', '2023-09-01', 'Data Structures', 'I'),
+    (4, 'Robert Brown', '2023-10-15', 'Operating Systems', 'I'),
+    (5, 'Emily Davis', '2023-08-15', 'Networking Basics', 'I'),
+    (6, 'Michael Miller', '2023-10-05', 'Java Programming', 'I'),
+    (7, 'Sarah Wilson', '2023-07-25', 'Python for Data Science', 'I'),
+    (8, 'David Anderson', '2023-09-10', 'Web Development', 'I'),
+    (9, 'Laura Thomas', '2023-09-05', 'Machine Learning', 'I'),
+    (10, 'James Martinez', '2023-08-20', 'Cloud Computing', 'I');
+
+
+delimiter #
+create procedure fine_calculation(IN rno int(3), bname char(20)) 
+begin
+declare i_date date;
+declare diff int;
+declare fine_amt int;
+declare exit handler for sqlexception select 'Table not Found';
+select dateofIssue into i_date from borrower where rollin = rno and bname =bname; 
+select datediff(curdate(), i_date) into diff;
+if(diff>15 and diff<=30) then
+set fine_amt = diff*5;
+insert into fine values (rno, curdate(), fine_amt); 
+elseif(diff>30) then
+set fine_amt = 15*5 + (diff-30)*50;
+insert into fine values (rno, curdate(), fine_amt);
+end if;
+update borrower set status = 'R' where rollin=rno and bname =bname;
+end;
+#
+
+delimiter ;
+
+call fine_calculation(3, 'Data Structures');
+
+select * from fine;
+
+select * from borrower;
+

@@ -1,0 +1,172 @@
+Create following tables using given schema and insert appropriate data into these tables. 
+Student(StudID, Name, Address, Marks)  
+Employee( EmplyeeID, Name, Address, Salary, DateOfJoining ,Department) 
+Weather(CityID, CityName, MinTemp, MaxTemp) 2. 
+1] Alter Student and Employee table to add Not Null constraint on all columns.   
+2] Alter the Student table to add Primary key constraint on StudID column.  
+3] Create a view JoiningInfo on Employee table displaying Employee ID, Name and  
+DateOfJoining of employees.  
+4] Crete index on primary key columns of all the tables.   
+5] Crate view MarksInfo on Student table displaying StuID and Marks.  
+6] Change the name of Weather table to WeatherData.  
+7] Drop column CityName from WeatherData table.  
+8] Add column Grade to Student table.  
+9] Crate a view “DistinctionStudents” on student table displaying data of students having  
+Distinction as Grade. 
+10] Create a sequence on StudID in student table.  
+11] Create a synonym ‘Emp_Info’ for Employee table. 
+
+### 1. Create the Tables and Insert Data
+
+```sql
+-- Create Student Table
+CREATE TABLE Student (
+    StudID INT,
+    Name VARCHAR(100),
+    Address VARCHAR(255),
+    Marks INT
+);
+
+-- Insert sample data into Student Table
+INSERT INTO Student (StudID, Name, Address, Marks) 
+VALUES
+(1, 'John Doe', '123 Main St', 85),
+(2, 'Jane Smith', '456 Oak St', 92),
+(3, 'Emily Johnson', '789 Pine St', 76);
+
+-- Create Employee Table
+CREATE TABLE Employee (
+    EmplyeeID INT,
+    Name VARCHAR(100),
+    Address VARCHAR(255),
+    Salary DECIMAL(10, 2),
+    DateOfJoining DATE,
+    Department VARCHAR(100)
+);
+
+-- Insert sample data into Employee Table
+INSERT INTO Employee (EmplyeeID, Name, Address, Salary, DateOfJoining, Department)
+VALUES
+(101, 'Alice Brown', '12 Park Lane', 55000, '2020-03-15', 'HR'),
+(102, 'Bob White', '34 Elm St', 60000, '2019-06-20', 'IT'),
+(103, 'Charlie Black', '56 Maple St', 65000, '2021-01-10', 'Finance');
+
+-- Create Weather Table
+CREATE TABLE Weather (
+    CityID INT,
+    CityName VARCHAR(100),
+    MinTemp INT,
+    MaxTemp INT
+);
+
+-- Insert sample data into Weather Table
+INSERT INTO Weather (CityID, CityName, MinTemp, MaxTemp)
+VALUES
+(1, 'New York', 5, 15),
+(2, 'Los Angeles', 15, 25),
+(3, 'Chicago', -5, 10);
+```
+
+### 2. Alter Tables
+
+#### 2.1 Add `NOT NULL` Constraints
+
+```sql
+-- Add NOT NULL constraints on all columns of Student table
+ALTER TABLE Student
+MODIFY StudID INT NOT NULL,
+MODIFY Name VARCHAR(100) NOT NULL,
+MODIFY Address VARCHAR(255) NOT NULL,
+MODIFY Marks INT NOT NULL;
+
+-- Add NOT NULL constraints on all columns of Employee table
+ALTER TABLE Employee
+MODIFY EmplyeeID INT NOT NULL,
+MODIFY Name VARCHAR(100) NOT NULL,
+MODIFY Address VARCHAR(255) NOT NULL,
+MODIFY Salary DECIMAL(10, 2) NOT NULL,
+MODIFY DateOfJoining DATE NOT NULL,
+MODIFY Department VARCHAR(100) NOT NULL;
+```
+
+#### 2.2 Add Primary Key on `StudID` Column
+
+```sql
+-- Add Primary Key constraint on StudID column in Student table
+ALTER TABLE Student
+ADD CONSTRAINT PK_Student PRIMARY KEY (StudID);
+```
+
+### 3. Create a View `JoiningInfo` on Employee Table
+
+```sql
+CREATE VIEW JoiningInfo AS
+SELECT EmplyeeID, Name, DateOfJoining
+FROM Employee;
+```
+
+### 4. Create Index on Primary Key Columns
+
+```sql
+-- Create Index on Primary Key columns
+CREATE INDEX idx_Student_StudID ON Student (StudID);
+CREATE INDEX idx_Employee_EmplyeeID ON Employee (EmplyeeID);
+CREATE INDEX idx_Weather_CityID ON Weather (CityID);
+```
+
+### 5. Create a View `MarksInfo` on Student Table
+
+```sql
+CREATE VIEW MarksInfo AS
+SELECT StudID, Marks
+FROM Student;
+```
+
+### 6. Rename `Weather` Table to `WeatherData`
+
+```sql
+-- Rename Weather table to WeatherData
+ALTER TABLE Weather
+RENAME TO WeatherData;
+```
+
+### 7. Drop Column `CityName` from `WeatherData` Table
+
+```sql
+-- Drop column CityName from WeatherData table
+ALTER TABLE WeatherData
+DROP COLUMN CityName;
+```
+
+### 8. Add Column `Grade` to Student Table
+
+```sql
+-- Add Grade column to Student table
+ALTER TABLE Student
+ADD Grade VARCHAR(10);
+```
+
+### 9. Create a View `DistinctionStudents` on Student Table
+
+```sql
+CREATE VIEW DistinctionStudents AS
+SELECT StudID, Name, Marks
+FROM Student
+WHERE Grade = 'Distinction';
+```
+
+### 10. Create a Sequence on `StudID` in Student Table
+
+```sql
+-- Create sequence for StudID in Student table
+CREATE SEQUENCE StudID_Seq
+START WITH 1
+INCREMENT BY 1;
+```
+
+### 11. Create a Synonym `Emp_Info` for Employee Table
+
+```sql
+-- Create a synonym for Employee table
+CREATE SYNONYM Emp_Info FOR Employee;
+```

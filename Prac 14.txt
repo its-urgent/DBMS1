@@ -1,0 +1,64 @@
+Consider Following Schema   
+Employee(employee_id, employee_name, City, Company_Name, Salary)   
+11. Find details of all employees who work for company “IBM” and live in city “Pune”.   
+12. Find names, and cities of all employees who work for “Infosys” or earn more than 
+30000.   
+13. Find all employees who are employees of “IBM” and not living in city “Mumbai”.   
+14. Find company wise maximum salary.   
+15. Find those companies whose employees earn higher salary, than average salary at  
+“IBM”. 
+
+To assist you with the SQL queries, I'll first provide the necessary queries based on the schema you mentioned:
+
+### 1. Find details of all employees who work for company "IBM" and live in city "Pune".
+```sql
+SELECT * 
+FROM Employee
+WHERE Company_Name = 'IBM' AND City = 'Pune';
+```
+
+### 2. Find names and cities of all employees who work for "Infosys" or earn more than 30,000.
+```sql
+SELECT employee_name, City 
+FROM Employee
+WHERE Company_Name = 'Infosys' OR Salary > 30000;
+```
+
+### 3. Find all employees who are employees of "IBM" and not living in city "Mumbai".
+```sql
+SELECT * 
+FROM Employee
+WHERE Company_Name = 'IBM' AND City != 'Mumbai';
+```
+
+### 4. Find company-wise maximum salary.
+```sql
+SELECT Company_Name, MAX(Salary) AS Max_Salary
+FROM Employee
+GROUP BY Company_Name;
+```
+
+### 5. Find those companies whose employees earn higher salary than the average salary at "IBM".
+```sql
+SELECT DISTINCT Company_Name
+FROM Employee
+WHERE Salary > (SELECT AVG(Salary) FROM Employee WHERE Company_Name = 'IBM');
+```
+
+### Insert Example (If Needed for Testing or Data Population)
+If you need to insert some example data into the `Employee` table for testing purposes, here’s how it can be done:
+
+```sql
+-- Inserting example data into Employee table
+INSERT INTO Employee (employee_id, employee_name, City, Company_Name, Salary) VALUES
+(1, 'Alice', 'Pune', 'IBM', 45000),
+(2, 'Bob', 'Mumbai', 'IBM', 30000),
+(3, 'Charlie', 'Pune', 'Infosys', 35000),
+(4, 'David', 'Chennai', 'Infosys', 50000),
+(5, 'Eva', 'Bangalore', 'TCS', 60000),
+(6, 'Frank', 'Pune', 'IBM', 25000),
+(7, 'Grace', 'Pune', 'IBM', 35000),
+(8, 'Hannah', 'Delhi', 'Infosys', 32000);
+```
+
+These SQL queries should help you perform the required operations on the `Employee` table based on your provided scenarios. Let me know if you need further clarification or adjustments!
